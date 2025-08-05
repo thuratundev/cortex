@@ -5,7 +5,8 @@ from google import genai
 from google.genai.types import EmbedContentConfig
 
 
-GOOGLE_API_KEY = 'AIzaSyDiidatii6YDYpp-gR-aRdhx7u79x0MK3I'
+# GOOGLE_API_KEY = 'AIzaSyDiidatii6YDYpp-gR-aRdhx7u79x0MK3I'
+GOOGLE_API_KEY = os.getenv('API_KEY')
 
 # Model name is simpler in this library. This is the equivalent of gemini-embedding-001
 MODEL_NAME = "gemini-embedding-001" 
