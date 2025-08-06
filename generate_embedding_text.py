@@ -8,31 +8,23 @@ from google.genai.types import EmbedContentConfig
 # GOOGLE_API_KEY = 'AIzaSyDiidatii6YDYpp-gR-aRdhx7u79x0MK3I'
 GOOGLE_API_KEY = os.getenv('API_KEY')
 
-# Model name is simpler in this library. This is the equivalent of gemini-embedding-001
 MODEL_NAME = "gemini-embedding-001" 
 
 # --- File Paths ---
 MASTER_DATA_FILE = "./data/feed_master_data.json"
-# We name the output file based on the library used for clarity
+
+# Output file for the generated embeddings
 OUTPUT_EMBEDDINGS_FILE = "./data/embedded_data.json"
 
 
 
 
 def generate_and_save_embeddings():
-    """
-    Reads procedure descriptions, generates embeddings using the Google AI
-    (genai) SDK, and saves them to a new JSON file.
-    """
-    # 1. Configure the API client with your key
-    print("Configuring the Google AI client...")
+
     if not GOOGLE_API_KEY:
         raise ValueError("FATAL ERROR: GOOGLE_API_KEY is not set. Please set the environment variable or paste the key directly in the script.")
     client = genai.Client(api_key=GOOGLE_API_KEY)
 
-    
-    # 2. Read the master data file
-    print(f"Reading master data from: {MASTER_DATA_FILE}")
     try:
         with open(MASTER_DATA_FILE, 'r', encoding='utf-8') as f:
             report_definitions = json.load(f)
@@ -40,7 +32,6 @@ def generate_and_save_embeddings():
         print(f"FATAL ERROR: Master data file not found at '{MASTER_DATA_FILE}'. Please create it first.")
         return
 
-    # 3. Generate embeddings for each procedure
     final_embeddings_list = []
     total_records = len(report_definitions)
     print(f"Found {total_records} records. Starting embedding generation with model '{MODEL_NAME}'...")
@@ -48,6 +39,18 @@ def generate_and_save_embeddings():
     for i, definition in enumerate(report_definitions):
         report_name = definition.get("ReportName", "UnknownReportName")
         description = definition.get("Description", "")
+        keywords = definition.get("Keywords", [])
+        sample_queries = definition.get("SampleQueries", [])
+
+        keywords_text = ", ".join(keywords)
+        sample_queries_text = ", ".join(sample_queries)
+
+        combined_text_for_embedding = (
+            f"Report Name: {report_name}. "
+            f"Description: {description}. "
+            f"Keywords: {keywords_text}. "
+            f"Typical User Questions: {sample_queries_text}"
+        )
         
         if not description:
             print(f"  - WARNING: Skipping '{report_name}' due to empty description.")
@@ -59,7 +62,7 @@ def generate_and_save_embeddings():
             # The API call is much simpler in this library!
             response = client.models.embed_content(
                 model=MODEL_NAME,
-                contents=description,
+                contents=combined_text_for_embedding,
                 config=EmbedContentConfig(
                     task_type="RETRIEVAL_DOCUMENT",  # Optional
                     output_dimensionality=3072,  # Optional
@@ -73,6 +76,7 @@ def generate_and_save_embeddings():
             
             final_embeddings_list.append({
                 "ReportName": report_name,
+                "Description": description,
                 "Vector": vector
             })
             
@@ -82,7 +86,7 @@ def generate_and_save_embeddings():
         except Exception as e:
             print(f"  - ERROR: Failed to generate embedding for '{report_name}'. Error: {e}")
 
-    # 4. Save the final list of embeddings to the output file
+    
     if final_embeddings_list:
         print(f"\nSaving {len(final_embeddings_list)} generated embeddings to {OUTPUT_EMBEDDINGS_FILE}...")
         try:
