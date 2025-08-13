@@ -1,5 +1,3 @@
-from google import genai
-from google.genai.types import EmbedContentConfig
 import query_finder
 
 if __name__ == "__main__":
@@ -26,4 +24,16 @@ if __name__ == "__main__":
     # test_query_burmese = "အိမ်မှာ ဘာလုပ်ရမလဲ"
     # test_query_burmese = "ကျောင်းမှန်မှန်တတ် စာမခက်"
     # test_query_burmese = "အလုပ်လုပ်ဖို့ ဘယ်လိုလုပ်ရမလဲ"
-    query_finder.run_rag_query(test_query_burmese)
+    
+    print("Welcome! Enter your query in Burmese (type 'bye' to exit)")
+    while True:
+        user_query = input("Enter your query: ").strip()
+        
+        if user_query.lower() == 'bye':
+            print("Goodbye!")
+            break
+            
+        if user_query:
+            query_finder.run_rag_query(user_query)
+        else:
+            print("Please enter a valid query")
