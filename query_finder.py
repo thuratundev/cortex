@@ -75,6 +75,15 @@ def find_most_similar_result(user_query: str, top_k: int = 5) -> list[dict] | No
 
     sorted_scores = sorted(scores, key=lambda x: x["Score"], reverse=True)
 
+    max_score = sorted_scores[0]['Score'] if sorted_scores else 0.0
+    for found in sorted_scores:
+        if found['Score'] == max_score:
+            print(f"Report Name: {found['ReportName']}, Score: {found['Score']:.4f}")
+            break
+        
+    #for found in sorted_scores: 
+    #print(f"Report Name: {found['ReportName']}, Score: {found['Score']:.4f}")
+
     return sorted_scores[:top_k]
 
 def find_best_response_with_gemini(user_query : str,similar_results: list[dict]) -> str:
