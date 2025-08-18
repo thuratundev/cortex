@@ -124,7 +124,7 @@ def find_best_response_with_gemini(user_query : str,similar_results: list[dict])
 
     return response.text.strip()
 
-def run_rag_query(user_query: str):
+def run_rag_query(user_query: str) -> str:
    
     similar_results = find_most_similar_result(user_query)
     
@@ -139,4 +139,5 @@ def run_rag_query(user_query: str):
     print(f"🤖  Cortex's Final Recommendation: {final_choice}")
     print("==============================================")
 
+    return final_choice.strip()
 
