@@ -1,4 +1,25 @@
 [
+
+	{
+    "ReportName": "Balance Sheet Report (ငွေစာရင်းရှင်းတမ်း)",
+    "Description": "Balance Sheet Report (ငွေစာရင်းရှင်းတမ်း) ဆိုသည်မှာ ကုမ္ပဏီ၏ ပိုင်ဆိုင်မှုများ၊ ချေးငွေများနှင့် ပိုင်ရှင်၏ ရှယ်ယာများကို အကျဉ်းချုပ်ဖော်ပြသည့် ငွေရေးကြေးရေး ရှင်းတမ်းဖြစ်သည်။၎င်းတွင် Assets = Liabilities + Equity ဟူသော စာရင်းကိုင်ဖော်မြူလာကို အသုံးပြုထားသည်။(Statement of Financial Position or Balance Sheet shows the financial statement that summarizes the company's assets,liabilities and owner's equity. The three balance sheet items in the report follow the accounting formuls: Assets = Liabilities + Equity .)",
+    "Keywords": [
+		"What is a Balance Sheet?",
+		"Balance Sheet ကို ဘာအတွက်သုံးတာလဲ။"
+		
+    ],
+    "SampleQueries": [
+		"What is a Balance Sheet?",
+		"Balance Sheet ဆိုတာ ဘာလဲ။",
+		"Balance Sheet (or Statement of Financial Position) က ဘာကိုပြတာလဲ။",
+		"Balance Sheet ကို ဘာအတွက်သုံးတာလဲ။",
+		"Show me the total assets on the Balance Sheet.",
+		"ငွေစာရင်းရှင်းတမ်းမှာ ပိုင်ဆိုင်မှုများကို ဘယ်လိုဖော်ပြထားလဲ။",
+		"Balance Sheet မှာ ချေးငွေများကို ဘယ်လိုဖော်ပြထားလဲ။",
+		"ငွေစာရင်းရှင်းတမ်းမှာ ပိုင်ရှင်၏ ရှယ်ယာများကို ဘယ်လိုဖော်ပြထားလဲ။"
+    ],
+    "Version": 1.0
+	},
 	{
 	"ReportName": "Sales By Each Invoice",
 	"Description": "ဘောင်ချာတစ်ခုချင်းစီအလိုက် စုစုပေါင်းတန်ဖိုးများကို အသေးစိတ် ကြည့်ရှုနိုင်သည်။ အရောင်းအဝယ်မှတ်တမ်းများ သို့မဟုတ် သတ်မှတ်ထားသော ကာလတစ်ခုအတွင်း  ရောင်ချခဲ့သော စာရင်းကို ကြည့်ရှုရန်အတွက်လည်း အသုံးပြုနိုင်သည်။",
