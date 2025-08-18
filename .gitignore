@@ -2,3 +2,4 @@
 idea/
 data/feed_master_data_org.json
 data/embedded_data_org.json
+.env

@@ -1,10 +1,11 @@
 import os
 import json
+from dotenv import load_dotenv
 import numpy as np
 from google import genai
 from google.genai.types import EmbedContentConfig
 
-# GOOGLE_API_KEY = 'AIzaSyDiidatii6YDYpp-gR-aRdhx7u79x0MK3I'
+load_dotenv()
 GOOGLE_API_KEY = os.getenv('API_KEY')
 
 
