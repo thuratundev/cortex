@@ -1,76 +1,71 @@
 import os
 import json
-import chromadb
-import uuid
 from app_config import MASTER_DATA_FILE
 from app_config import OUTPUT_EMBEDDINGS_FILE
-import chroma_agent
+import agents.embedding_agent as embedding_agent
+import agents.db_agent as db_agent
 
-_chroma_agent = chroma_agent.chroma_agent(db_path="./db", collection_name="reports")
-
-def testChroma():
-
-    # client = chromadb.PersistentClient(path="./db")
-    # collection = client.get_or_create_collection(name="reports")
-
-
-    _documentid = _chroma_agent.add_document("North America is a continent[b] in the Northern and Western hemispheres.[c] North America is bordered to the north by the Arctic Ocean, to the east by the Atlantic Ocean, to the southeast by South America and the Caribbean Sea, and to the south and west by the Pacific Ocean. The region includes Middle America (comprising the Caribbean, Central America, and Mexico) and Northern America.", {"source": "continent"})
-    print(f"Added document with ID: {_documentid}")
-    # collection.add(
-    #     ids=[str(uuid.uuid4())],
-    #     documents=["Candy is Sweet"],
-    #     metadatas=[{"source": "test"}]
-    # )
-
-def testQuery():
-
-    results = _chroma_agent.query("Which continent is Canada in?", n_results=1)
-    # Access the embeddings from the results
-    if 'embeddings' in results and results['embeddings']:
-        # retrieved_embeddings = results['embeddings']
-        # print("Retrieved Embeddings:", retrieved_embeddings)
-        for i, document in enumerate(results['documents']):
-            print(f"Retrieved Document {i+1}: {document}")
-    else:
-        print("No embeddings found in the query results.")
 
 def startup():
     try:
+        with open(MASTER_DATA_FILE, 'r', encoding='utf-8') as f:
+            report_definitions = json.load(f)
+    except FileNotFoundError:
+        print(f"FATAL ERROR: Master data file not found at '{MASTER_DATA_FILE}'. Please create it first.")
+        return
+
+    final_embeddings_list = []
+    total_records = len(report_definitions)
+    for i, definition in enumerate(report_definitions):
+        report_id = definition.get("Id", 0)
+        version_no = definition.get("Version", 1.0)
+        report_name = definition.get("ReportName", "UnknownReportName")
+        description = definition.get("Description", "")
+        keywords = definition.get("Keywords", [])
+        sample_queries = definition.get("SampleQueries", [])
+
+        keywords_text = ", ".join(keywords)
+        sample_queries_text = ", ".join(sample_queries)
+
+        combined_text_for_embedding = (
+                f"Description: {description}. "
+                f"Keywords: {keywords_text}. "
+                f"Typical User Questions: {sample_queries_text}"
+            )
+        
+        if not description:
+            print(f"  - WARNING: Skipping '{report_name}' due to empty description.")
+            continue
+        print(f"  - ({i+1}/{total_records}) Processing: {report_name}")
+        
+
         try:
-            with open(MASTER_DATA_FILE, 'r', encoding='utf-8') as f:
-                report_definitions = json.load(f)
-        except FileNotFoundError:
-            print(f"FATAL ERROR: Master data file not found at '{MASTER_DATA_FILE}'. Please create it first.")
-            return
+            # The API call is much simpler in this library!
+            embedder = embedding_agent.get_embedding_model()
+            vector = embedder.embed_query(combined_text_for_embedding)
 
-        
-        total_records = len(report_definitions)
-        for i, definition in enumerate(report_definitions):
-            report_name = definition.get("ReportName", "UnknownReportName")
-            description = definition.get("Description", "")
-            keywords = definition.get("Keywords", [])
-            sample_queries = definition.get("SampleQueries", [])
+            final_embeddings_list.append({
+                "id": report_id,
+                "reportname": report_name,
+                "description": description,
+                "keywords": keywords,
+                "samplequeries": sample_queries,
+                "modelname": "Gemini",
+                "verno": version_no,
+                "embeddedvector": vector
+            })
 
-            keywords_text = ", ".join(keywords)
-            sample_queries_text = ", ".join(sample_queries)
+            print(f"  final embedded list length: {len(final_embeddings_list)}.")
 
-            combined_text_for_embedding = (
-                    f"Report Name: {report_name}. "
-                    f"Description: {description}. "
-                    f"Keywords: {keywords_text}. "
-                    f"Typical User Questions: {sample_queries_text}"
-                )
-            
-            if not description:
-                print(f"  - WARNING: Skipping '{report_name}' due to empty description.")
-                continue
-            print(f"  - ({i+1}/{total_records}) Processing: {report_name}")
-            break  ## test code for only one report
-                
-        
-    except Exception as e:
-        print("Error loading master data file:", e)
+        except Exception as e:
+            print(f"  - ERROR: Failed to generate embedding for '{report_name}'. Error: {e}")
 
+    if final_embeddings_list:
+        print(f"Saving {len(final_embeddings_list)} embeddings to database...")
+        db = db_agent.db_agent()
+        db.insert_document(final_embeddings_list)
+    else:
+        print("No valid embeddings found.")
 
 if __name__ == "__main__":
-    testQuery()
+    startup()

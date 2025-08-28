@@ -10,7 +10,7 @@ class db_agent:
     def insert_document(self, documents: list[dict]):
         try:
             self.cursor = self.connection.cursor()
-            query = "INSERT INTO documents (id, reportname, description, keywords, samplequeries, modelname, verno, embeddedvector) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO reportvector (id, reportname, description, keywords, samplequeries, modelname, verno, embeddedvector) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             
             for document in documents:
                 values = (
@@ -29,6 +29,27 @@ class db_agent:
         except Exception as ex:
             print(f"Error inserting document: {ex}")
             self.connection.rollback()
+        finally:
+            self.cursor.close()
+
+    def get_similar_documents(self, embedded_user_query: str) -> list[dict]:
+        try:
+            self.cursor = self.connection.cursor()
+            query = "SELECT reportname,description,1 - (embeddedvector <=> %s::vector) AS similarity FROM reportvector ORDER BY similarity DESC LIMIT 5"
+            self.cursor.execute(query, (embedded_user_query,))
+            results = self.cursor.fetchall()
+            # Convert tuple results to dictionaries with named keys
+            documents = []
+            for row in results:
+                documents.append({
+                    'reportname': row[0],
+                    'description': row[1],
+                    'similarity': row[2]
+                })
+            return documents
+        except Exception as ex:
+            print(f"Error retrieving similar documents: {ex}")
+            return []
         finally:
             self.cursor.close()
 
