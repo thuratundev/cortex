@@ -12,7 +12,7 @@ def get_chat_response(user_query: str) -> str | None:
    return chatting_agent.chat(user_query, similar_results)
 
 if __name__ == "__main__":
-    user_query = "ရောင်းအားအကောင်းဆုံး ပစ္စည်းကို ဘယ်လိုသိနိုင်မလဲ။"
+    user_query = "ရန်ကုန်မှ မန်းလေးသို့ ကုန်ပစ္စည်းအပြောင်းရွေ့ စာရင်းသိချင်ရင်ဘယ်လို သိနိုင်မလဲ"
     response = get_chat_response(user_query)
 
 
