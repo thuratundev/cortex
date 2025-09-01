@@ -32,11 +32,3 @@ def get_embedding_model():
             openai_api_key=config["api_key"],
             model=config["model_name"]
         )
-
-if __name__ == "__main__":
-    embedding = get_embedding_model()
-    print("Initialized embedding model:", embedding)
-
-    test_text = "ကုန်ပစ္စည်းလက်ကျန် စာရင်းကို ဘယ်လိုကြည့်ရမလဲ"
-    embedded_text = embedding.embed_query(test_text)
-    print("Embedding for test text:", embedded_text)

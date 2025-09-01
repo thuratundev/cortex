@@ -2,6 +2,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 import app_config
+import asyncio
 
 # --- Prompt template definition ---
 # Define your system prompt as a string.
@@ -39,7 +40,7 @@ template = ChatPromptTemplate([
 
 CHAT_MODEL = "gemini" #  gemini, openai
 
-def chat(user_query:str, similar_results: list[dict]) -> str:
+async def chat(user_query: str, similar_results: list[dict]) -> str:
     try:
         print(f"Finding best response for query: {user_query}")
 
@@ -50,20 +51,22 @@ def chat(user_query:str, similar_results: list[dict]) -> str:
         for i, report in enumerate(similar_results):
             report_name = report['reportname']
             description = report["description"]
-            
+
             context_for_prompt += f"--- Report {i+1} ---\n"
             context_for_prompt += f"Report အမည်: {report_name}\n"
             context_for_prompt += f"Report ဖော်ပြချက်: {description}\n\n"
-    
+
         template_variables = {
             "user_query": user_query.strip(),
             "context_for_prompt": context_for_prompt.strip()
         }
 
+        
         formatted_message = template.format_messages(**template_variables)
 
         chat_model = get_chat_model()
 
+        
         response = chat_model.invoke(formatted_message)
 
         return response.content

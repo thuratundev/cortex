@@ -1,4 +1,3 @@
-import data_query_service
 import os
 import sys
 
@@ -6,18 +5,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import  app_config 
 from agents import chatting_agent
+from services import data_query_service
 
-def get_chat_response(user_query: str) -> str | None:
-   similar_results = data_query_service.get_similar(user_query)
-   return chatting_agent.chat(user_query, similar_results)
-
-if __name__ == "__main__":
-    user_query = "ရန်ကုန်မှ မန်းလေးသို့ ကုန်ပစ္စည်းအပြောင်းရွေ့ စာရင်းသိချင်ရင်ဘယ်လို သိနိုင်မလဲ"
-    response = get_chat_response(user_query)
+async def get_chat_response(user_query: str) -> str | None:
+   similar_results = await data_query_service.get_similar(user_query)
+   return await chatting_agent.chat(user_query, similar_results)
 
 
-    print("\n==============================================")
-    print(f"👤  User Query: \"{user_query}\"")
-    print(f"🤖  Cortex's Final Recommendation: {response}")
-    print("==============================================")
     
