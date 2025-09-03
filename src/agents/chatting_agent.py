@@ -67,7 +67,7 @@ async def chat(user_query: str, similar_results: list[dict]) -> str:
         chat_model = get_chat_model()
 
         
-        response = chat_model.invoke(formatted_message)
+        response = await chat_model.ainvoke(formatted_message)
 
         return response.content
 
@@ -79,7 +79,8 @@ def get_chat_model():
 
     if CHAT_MODEL == "gemini":
         return ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash-001",
+            # model="gemini-2.0-flash-001",
+            model ="gemini-2.0-flash",
             api_key=app_config.GOOGLE_API_KEY,
         )
     elif CHAT_MODEL == "openai":

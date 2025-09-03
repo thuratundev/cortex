@@ -18,7 +18,7 @@ def load_master_data():
         print(f"FATAL ERROR: Master data file not found at '{app_config.MASTER_DATA_FILE}'. Please create it first.")
         return []
     
-def generate_embedded_data() -> list[dict] | None:
+async def generate_embedded_data() -> list[dict] | None:
     final_embeddings_list = []
     try:
         feed_data = load_master_data()
@@ -49,7 +49,7 @@ def generate_embedded_data() -> list[dict] | None:
             try:
                 # The API call is much simpler in this library!
                 embedder = embedding_agent.get_embedding_model()
-                vector = embedder.embed_query(combined_text_for_embedding)
+                vector = await embedder.aembed_query(combined_text_for_embedding)
 
                 final_embeddings_list.append({
                     "id": report_id,
@@ -71,7 +71,7 @@ def generate_embedded_data() -> list[dict] | None:
         print(f"FATAL ERROR: Failed to generate embedded data. Error: {e}")
     return final_embeddings_list
 
-def save_embeddings_to_db(embeddings: list[dict]) -> bool:
+async def save_embeddings_to_db(embeddings: list[dict]) -> bool:
     try:
         db = db_agent.db_agent() 
         db.insert_document(embeddings)
@@ -80,13 +80,13 @@ def save_embeddings_to_db(embeddings: list[dict]) -> bool:
         print(f"ERROR: Failed to save embeddings to database. Error: {e}")
         return False
     
-def execute():
-    embeddings = generate_embedded_data()
+async def execute():
+    embeddings = await generate_embedded_data()
     if embeddings:
-        save_embeddings_to_db(embeddings)
-        print(f"Successfully embedded and saved {len(embeddings)} records.")
+        await save_embeddings_to_db(embeddings)
+        return len(embeddings)
     else:
-        print("No valid embeddings to save.")
+        return 0
 
 if __name__ == "__main__":
     execute()

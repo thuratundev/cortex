@@ -6,6 +6,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from services import chatting_service
+from services import embedding_service
 
 class QueryData(BaseModel):
     query: str
@@ -24,3 +25,7 @@ async def get_query(data: QueryData):
     return {"query": data.query, "response": result}
 
 
+@app.post("/feed")
+async def feed_data():
+    result = await embedding_service.execute()
+    return {"status": "completed", "records_processed": (f"Successfully embedded and saved {result} records.")}

@@ -10,10 +10,11 @@ class db_agent:
     def insert_document(self, documents: list[dict]):
         try:
             self.cursor = self.connection.cursor()
-            query = "INSERT INTO reportvector (id, reportname, description, keywords, samplequeries, modelname, verno, embeddedvector) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            query = "DELETE FROM reportvector WHERE id = %s;INSERT INTO reportvector (id, reportname, description, keywords, samplequeries, modelname, verno, embeddedvector) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             
             for document in documents:
                 values = (
+                    document.get("id"), # for DELETE clause
                     document.get("id"),
                     document.get("reportname"),
                     document.get("description"),
