@@ -9,11 +9,15 @@ import  app_config
 from agents import embedding_agent 
 from agents import db_agent
 
+
 def load_master_data():
     try:
-        with open(app_config.MASTER_DATA_FILE, 'r', encoding='utf-8') as f:
-            report_definitions = json.load(f)
-            return report_definitions
+        if isBulkFeed == True:
+            with open(app_config.MASTER_DATA_FILE, 'r', encoding='utf-8') as f:
+                report_definitions = json.load(f)
+                return report_definitions
+        else:
+            return json.loads(feedJson)
     except FileNotFoundError:
         print(f"FATAL ERROR: Master data file not found at '{app_config.MASTER_DATA_FILE}'. Please create it first.")
         return []
@@ -80,7 +84,13 @@ async def save_embeddings_to_db(embeddings: list[dict]) -> bool:
         print(f"ERROR: Failed to save embeddings to database. Error: {e}")
         return False
     
-async def execute():
+async def execute(_isBulkFeed: bool = False, _feedJson: str | None = None) -> int:
+    global feedJson, isBulkFeed
+    feedJson = _feedJson 
+    isBulkFeed = _isBulkFeed
+
+    print (f"Received feed data: {feedJson}")
+
     embeddings = await generate_embedded_data()
     if embeddings:
         await save_embeddings_to_db(embeddings)
