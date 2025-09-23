@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import uvicorn
 # from pydantic import BaseModel
 import os
 import sys
@@ -34,3 +35,6 @@ async def get_query(data: QueryData):
 async def feed_data():
     result = await embedding_service.execute(_isBulkFeed=True)
     return {"status": "Bulk Feed completed", "records_processed": (f"Successfully embedded and saved {result} records.")}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
