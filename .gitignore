@@ -1,6 +1,7 @@
 .venv/
 idea/
 .env
+env_sample
 dist/
 __pycache__/
 build/
